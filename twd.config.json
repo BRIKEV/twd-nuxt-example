@@ -1,0 +1,6 @@
+{
+  "url": "http://localhost:3000",
+  "headless": true,
+  "coverage": false,
+  "retryCount": 1
+}
