@@ -26,7 +26,11 @@ jobs:
       - name: Start Nuxt dev server
         run: |
           nohup npm run dev > nuxt.log 2>&1 &
-          npx wait-on http://localhost:3000
+          # Wait on both the home page and /todos. Nuxt dev compiles routes
+          # on-demand on first request, so warming /todos here ensures it's
+          # compiled before the tests run (otherwise the first visit races
+          # the on-demand compile and times out).
+          npx wait-on http://localhost:3000 http://localhost:3000/todos
         env:
           CI: true
 
