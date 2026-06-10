@@ -92,7 +92,45 @@ npm run preview    # preview the production build locally
   `todo-add`, `todo-list`, `todo-error`, and per-item
   `todo-item-${id}` and `todo-delete-${id}`.
 - On **client-side navigation** to `/todos`, the list `GET` and every
-  create/update/delete call run in the browser, so they show up in the
-  Network tab and can be observed/mocked by TWD's service worker.
-- Because the DB persists, tests aren't isolated by default. Reset with
-  `rm -rf .data` between runs if you need a clean slate.
+  create/delete call run in the browser, so they show up in the Network tab.
+
+### Testing against the real database (instead of mocking routes)
+
+Because this app has a real backend, TWD tests can exercise the actual API +
+SQLite instead of mocking each route. To keep tests isolated, there's a
+**dev-only** reset endpoint that restores the seeded state:
+
+```
+POST /api/__test/reset
+```
+
+It deletes all rows, resets the id sequence (so ids are a deterministic
+`1, 2, 3…` every time), re-seeds, and returns `{ ok, todos }`. It's guarded by
+`import.meta.dev`, so in a production build it returns `404` and is never
+reachable.
+
+Call it from a `beforeEach` so every test starts from the same known state:
+
+```ts
+import { twd, screenDom, userEvent } from "twd-js";
+import { describe, it, beforeEach } from "twd-js/runner";
+
+describe("Todo List (real SQLite backend)", () => {
+  beforeEach(async () => {
+    // Reset the DB to its seeded state — no route mocking needed.
+    await fetch("/api/__test/reset", { method: "POST" });
+  });
+
+  it("creates a todo end-to-end", async () => {
+    await twd.visit("/todos");
+    await userEvent.type(await screenDom.getByTestId("todo-input"), "Write a TWD test");
+    await userEvent.click(await screenDom.getByTestId("todo-add"));
+    twd.should(await screenDom.findByText("Write a TWD test"), "be.visible");
+  });
+});
+```
+
+> Seeded rows after a reset: id `1` "Learn Nuxt server routes" (done),
+> id `2` "Build a real todo list", id `3` "Test it with TWD".
+
+If you ever need a clean slate outside of tests, delete the file: `rm -rf .data`.

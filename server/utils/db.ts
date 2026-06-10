@@ -6,6 +6,18 @@ import Database from 'better-sqlite3'
 
 let db: Database.Database | undefined
 
+// Seed rows used both on first boot and on every reset (see resetDb()).
+const SEED: ReadonlyArray<{ title: string; done: number }> = [
+  { title: 'Learn Nuxt server routes', done: 1 },
+  { title: 'Build a real todo list', done: 0 },
+  { title: 'Test it with TWD', done: 0 },
+]
+
+function seed(database: Database.Database): void {
+  const insert = database.prepare('INSERT INTO todos (title, done) VALUES (?, ?)')
+  for (const todo of SEED) insert.run(todo.title, todo.done)
+}
+
 export function useDb(): Database.Database {
   if (db) return db
 
@@ -29,12 +41,21 @@ export function useDb(): Database.Database {
 
   // Seed a few rows the very first time so the UI isn't empty.
   const { count } = db.prepare('SELECT COUNT(*) AS count FROM todos').get() as { count: number }
-  if (count === 0) {
-    const insert = db.prepare('INSERT INTO todos (title, done) VALUES (?, ?)')
-    insert.run('Learn Nuxt server routes', 1)
-    insert.run('Build a real todo list', 0)
-    insert.run('Test it with TWD', 0)
-  }
+  if (count === 0) seed(db)
 
   return db
+}
+
+// Reset the database to its seeded state. Used by the dev-only test reset
+// endpoint so each test can start from a known, deterministic state.
+// Clearing sqlite_sequence makes the seeded ids deterministic (1, 2, 3...)
+// on every reset, which keeps id-based assertions stable across test runs.
+export function resetDb(): void {
+  const database = useDb()
+  const reset = database.transaction(() => {
+    database.exec('DELETE FROM todos')
+    database.exec("DELETE FROM sqlite_sequence WHERE name = 'todos'")
+    seed(database)
+  })
+  reset()
 }
