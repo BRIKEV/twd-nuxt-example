@@ -21,7 +21,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "chokidar": "^5.0.0",
     "tailwindcss": "^4.3.0",
-    "twd-js": "^1.8.0",
-    "twd-relay": "^1.2.0"
+    "twd-js": "^1.10.1",
+    "twd-relay": "^1.4.0"
   }
 }
