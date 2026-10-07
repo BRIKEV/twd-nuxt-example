@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "relay": "twd-relay serve"
+    "relay": "twd-relay serve",
+    "test:ci": "npx twd-cli run"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",
@@ -21,6 +22,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "chokidar": "^5.0.0",
     "tailwindcss": "^4.3.0",
+    "twd-cli": "1.10.0",
     "twd-js": "^1.10.1",
     "twd-relay": "^1.4.0"
   }

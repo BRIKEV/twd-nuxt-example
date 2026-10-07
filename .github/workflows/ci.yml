@@ -36,5 +36,3 @@ jobs:
 
       - name: Run TWD tests
         uses: BRIKEV/twd-cli/.github/actions/run@main
-        with:
-          contract-report: 'true'
