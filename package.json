@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "relay": "twd-relay serve",
-    "test:ci": "npx twd-cli run"
+    "test:ci": "npx twd-cli run",
+    "lint:twd": "twd-lint"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",
@@ -24,6 +25,7 @@
     "tailwindcss": "^4.3.0",
     "twd-cli": "1.10.0",
     "twd-js": "^1.10.1",
+    "twd-lint": "^1.0.0",
     "twd-relay": "^1.4.0"
   }
 }

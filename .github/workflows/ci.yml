@@ -23,6 +23,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Seconds, before any server starts: a broken test fails here, not in the browser.
+      - name: Lint TWD tests
+        run: npm run lint:twd
+
       - name: Start Nuxt dev server
         run: |
           nohup npm run dev > nuxt.log 2>&1 &
